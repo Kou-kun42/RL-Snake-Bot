@@ -33,6 +33,18 @@ class QTrainer:
 
     
     # TODO: Explain how this method works.
+    """
+    We start off by getting the game variables and creating tensors of the
+    given data so that we can then use as inputs for our deep Q network model.
+    We then check if the state is 1 and if so, we use torch.unsqueeze to convert
+    the tensor to a size of one.  After this, we get the predicted q value, and 
+    clone it to create the target that we can later use to calculate the loss.
+    We then iterate through the done states and update target with the rewards
+    from each state, or if the game is ongoing, we use our gamma rate and the
+    new state parameters to obtain a new Q value that we store in target using
+    the current index.  We then zero out the gradients of the optimized tensors
+    and perform a single step in the optimization function.
+    """
     def train_step(self,state,action,reward,next_state,done):
         state = torch.tensor(state,dtype=torch.float).cpu()
         next_state = torch.tensor(next_state,dtype=torch.float).cpu()

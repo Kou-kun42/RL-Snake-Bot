@@ -92,6 +92,12 @@ class Agent:
         self.trainer.train_step(state,action,reward,next_state,done)
 
     # TODO: What is the role of epsilon in this method? Feel free to reference the OpenAI Gym RL tutorial from 02/09/22
+    """
+    Epsilon is used to introduce randomness into the algorithm.  This helps prevent overfitting by allowing the
+    AI to explore without heavily depending on the information it has already gained.  In this implementation, a
+    higher epsilon value allows for a greater chance of exploration.  As the number of games increases, our epsilon
+    gets smaller and therefore reduces the chance for random movement.
+    """
     def get_action(self,state):
         # random moves: tradeoff explotation / exploitation
         self.epsilon = 80 - self.n_game
@@ -107,6 +113,15 @@ class Agent:
         return final_move
 
 # TODO: Write a couple sentences describing the training process coded below.
+"""
+This is the main driver code for the program.  It starts off by initializing all the variables
+and setting the agent and game classes.  Then we enter an infinite loop that cycles over
+every move.  It begins by getting the state of the game, then getting the player movement,
+then performing the move and obtaining the new state of the game.  With this information,
+we train the short term memory of the AI, and if the game is still in progress the cycle repeats.
+If the game has concluded, we train the long term memory, reset the game, print a status message,
+and increment the total stats  before repeating the loop with a new game.
+"""
 def train():
     plot_scores = []
     plot_mean_scores = []
@@ -136,8 +151,8 @@ def train():
             game.reset()
             agent.n_game += 1
             agent.train_long_memory()
-            if(score > reward): # new High score 
-                reward = score
+            if(score > record): # new High score 
+                record = score
                 agent.model.save()
             print('Game:',agent.n_game,'Score:',score,'Record:',record)
             
@@ -153,3 +168,15 @@ if(__name__=="__main__"):
 
 # TODO: Write a brief paragraph on your thoughts about this implementation. 
 # Was there anything surprising, interesting, confusing, or clever? Does the code smell at all?
+"""
+I think the overall implementation is really good, and makes sense from an RL viewpoint.
+The scoring system is pretty interesting, and I wonder if it could be improved by tweaking
+the "else" state where the player doesn't eat but doesn't lose either.  In otherwords, 
+something I'd like to test is to increase the points awarded for "else" or maybe even 
+decreasing the penalty for "Game Over" and seeing if that creates a better model.
+
+Something I noticed that seems to be a bug, on line 154, we're currently checking if
+score is greater than reward, and then setting reward equal to score.  I think
+we actually want to see if score is greater than record, and then set record equal 
+to score.  I've made that change in this file.
+"""
